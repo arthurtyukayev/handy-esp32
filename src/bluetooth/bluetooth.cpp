@@ -1,11 +1,13 @@
 #include "bluetooth.h"
 #include "../keyboard/keyboard.h"
 #include "BLEDevice.h"
-#include "HIDTypes.h"
-
 #include <M5Unified.h>
 
-#define DEVICE_NAME "Handy ATOM Lite"
+#ifndef DEVICE_BLUETOOTH_NAME
+#define DEVICE_BLUETOOTH_NAME "Handy Mini"
+#endif
+
+#define DEVICE_MANUFACTURER_NAME "M5Stack"
 
 bool isBleConnected = false;
 BLEHIDDevice *hid = nullptr;
@@ -56,7 +58,7 @@ void OutputCallbacks::onWrite(BLECharacteristic *characteristic) {
 }
 
 void bluetoothTask(void *) {
-  BLEDevice::init(DEVICE_NAME);
+  BLEDevice::init(DEVICE_BLUETOOTH_NAME);
   BLEServer *server = BLEDevice::createServer();
   server->setCallbacks(new BleKeyboardCallbacks());
 
@@ -65,7 +67,7 @@ void bluetoothTask(void *) {
   output = hid->outputReport(1);
   output->setCallbacks(new OutputCallbacks());
 
-  hid->manufacturer()->setValue("M5Stack ATOM Lite");
+  hid->manufacturer()->setValue(DEVICE_MANUFACTURER_NAME);
   hid->pnp(0x02, 0xe502, 0xa111, 0x0210);
   hid->hidInfo(0x00, 0x02);
 
