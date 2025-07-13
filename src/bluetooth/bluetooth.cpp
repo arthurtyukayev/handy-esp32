@@ -1,6 +1,7 @@
 #include "bluetooth.h"
 #include "../keyboard/keyboard.h"
 #include "BLEDevice.h"
+#include "shared.h"
 #include <M5Unified.h>
 
 #ifndef DEVICE_BLUETOOTH_NAME
@@ -13,6 +14,8 @@ bool isBleConnected = false;
 BLEHIDDevice *hid = nullptr;
 BLECharacteristic *input;
 BLECharacteristic *output;
+
+const uint16_t CCCD_NOTIFICATIONS_ENABLED = 0x0001;
 
 const uint8_t REPORT_MAP[] = {
     USAGE_PAGE(1),      0x01, USAGE(1),           0x06,
@@ -57,6 +60,17 @@ void OutputCallbacks::onWrite(BLECharacteristic *characteristic) {
   OutputReport *report = (OutputReport *)characteristic->getData();
 }
 
+class InputReportCCCDCallbacks : public BLEDescriptorCallbacks {
+  void onWrite(BLEDescriptor *descriptor) override {
+    uint16_t cccdValue = *(uint16_t *)descriptor->getValue();
+    if (cccdValue & CCCD_NOTIFICATIONS_ENABLED) {
+      if (xConnectionSemaphore != NULL) {
+        xSemaphoreGive(xConnectionSemaphore);
+      }
+    }
+  }
+};
+
 void bluetoothTask(void *) {
   BLEDevice::init(DEVICE_BLUETOOTH_NAME);
   BLEServer *server = BLEDevice::createServer();
@@ -65,6 +79,11 @@ void bluetoothTask(void *) {
   hid = new BLEHIDDevice(server);
   input = hid->inputReport(1);
   output = hid->outputReport(1);
+
+  BLE2902 *cccDesc =
+      (BLE2902 *)input->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));
+  cccDesc->setCallbacks(new InputReportCCCDCallbacks());
+
   output->setCallbacks(new OutputCallbacks());
 
   hid->manufacturer()->setValue(DEVICE_MANUFACTURER_NAME);
@@ -83,7 +102,8 @@ void bluetoothTask(void *) {
   advertising->addServiceUUID(hid->deviceInfo()->getUUID());
   advertising->start();
 
-  while (true) {
-    delay(1000);
-  }
+  M5_LOGI("Bluetooth task started. Waiting for connections.");
+
+  // The task can now simply idle. All work is done in callbacks.
+  vTaskDelete(NULL); // Or loop with a long vTaskDelay if you prefer.
 }

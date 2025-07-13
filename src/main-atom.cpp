@@ -1,6 +1,8 @@
 #include "bluetooth/bluetooth.h"
+#include "freertos/projdefs.h"
 #include "keyboard/keyboard.h"
 #include "led/neopixel.h"
+#include "shared.h"
 
 #include <Arduino.h>
 #include <M5Unified.h>
@@ -10,49 +12,60 @@
 NeoPixel led;
 
 TaskHandle_t xLedFlashTaskHandle = NULL;
-bool wasShownConnectedLed = false;
+SemaphoreHandle_t xConnectionSemaphore = NULL;
 
 void flashPixel(void *) {
   while (true) {
     led.setRed();
-    delay(250);
+    vTaskDelay(pdMS_TO_TICKS(250));
     led.clear();
-    delay(250);
+    vTaskDelay(pdMS_TO_TICKS(250));
   }
 };
+
+void connectionManagerTask(void *) {
+  while (true) {
+    if (xSemaphoreTake(xConnectionSemaphore, portMAX_DELAY) == pdTRUE) {
+      if (xLedFlashTaskHandle != NULL) {
+        vTaskDelete(xLedFlashTaskHandle);
+        xLedFlashTaskHandle = NULL;
+        led.clear();
+      }
+
+      led.setGreen();
+      vTaskDelay(pdMS_TO_TICKS(1000));
+      led.clear();
+
+      while (isBleConnected) {
+        vTaskDelay(pdMS_TO_TICKS(100));
+      }
+
+      // Finally, the bluetooth was disconnected, just show a red led
+      led.setRed();
+    }
+  }
+}
 
 void setup() {
   Serial.begin(115200);
 
+  xConnectionSemaphore = xSemaphoreCreateBinary();
+
   xTaskCreate(bluetoothTask, "bluetooth", 20000, NULL, 5, NULL);
+  xTaskCreate(connectionManagerTask, "connManager", 5000, NULL, 4, NULL);
 
   led.begin();
-  led.setRed();
 
   M5.begin();
   M5.BtnA.setHoldThresh(BUTTON_HOLD_THRESHOLD);
 
   xTaskCreate(flashPixel, "ledflash", 5000, NULL, 6, &xLedFlashTaskHandle);
 }
+
 void loop() {
   M5.update();
-  M5.delay(1);
 
   if (isBleConnected) {
-    if (xLedFlashTaskHandle != NULL) {
-      vTaskDelete(xLedFlashTaskHandle);
-      xLedFlashTaskHandle = NULL;
-      led.clear();
-    }
-
-    if (!wasShownConnectedLed) {
-      M5.delay(250);
-      led.setGreen();
-      M5.delay(1000);
-      led.clear();
-      wasShownConnectedLed = true;
-    }
-
     int talkButtonState = M5.BtnA.wasHold()               ? 1
                           : M5.BtnA.wasClicked()          ? 2
                           : M5.BtnA.wasPressed()          ? 3
@@ -66,10 +79,6 @@ void loop() {
       clearKey();
       led.clear();
     }
-    M5.delay(1);
-  } else if (xLedFlashTaskHandle == NULL) {
-    wasShownConnectedLed = false;
-    xTaskCreate(flashPixel, "ledflash", 5000, NULL, 6, &xLedFlashTaskHandle);
   }
 
   M5.delay(1);
