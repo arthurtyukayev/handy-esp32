@@ -83,6 +83,7 @@ void bluetoothTask(void *) {
   advertising->addServiceUUID(hid->deviceInfo()->getUUID());
   advertising->start();
 
-  M5_LOGI("BLE Ready.");
-  delay(portMAX_DELAY);
+  while (true) {
+    delay(1000);
+  }
 }
