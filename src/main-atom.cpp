@@ -1,5 +1,4 @@
 #include "bluetooth/bluetooth.h"
-#include "freertos/projdefs.h"
 #include "keyboard/keyboard.h"
 #include "led/neopixel.h"
 #include "shared.h"
