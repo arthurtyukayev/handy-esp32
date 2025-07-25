@@ -1,4 +1,5 @@
 #include "bluetooth.h"
+#include "../battery/atom-base.h"
 #include "../keyboard/keyboard.h"
 #include "BLEDevice.h"
 #include "shared.h"
@@ -14,6 +15,8 @@ bool isBleConnected = false;
 BLEHIDDevice *hid = nullptr;
 BLECharacteristic *input;
 BLECharacteristic *output;
+
+extern AtomBaseBattery battery;
 
 const uint16_t CCCD_NOTIFICATIONS_ENABLED = 0x0001;
 
@@ -71,6 +74,21 @@ class InputReportCCCDCallbacks : public BLEDescriptorCallbacks {
   }
 };
 
+void batteryUpdateTask(void *) {
+  M5_LOGI("Battery update task started");
+  vTaskDelay(pdMS_TO_TICKS(2000));
+
+  while (true) {
+    if (hid != nullptr && isBleConnected) {
+      uint8_t batteryLevel = battery.getBatteryLevel();
+      hid->setBatteryLevel(batteryLevel);
+      M5_LOGD("Battery level updated: %d%%", batteryLevel);
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(240000));
+  }
+}
+
 void bluetoothTask(void *) {
   BLEDevice::init(DEVICE_BLUETOOTH_NAME);
   BLEServer *server = BLEDevice::createServer();
@@ -103,6 +121,8 @@ void bluetoothTask(void *) {
   advertising->start();
 
   M5_LOGI("Bluetooth task started. Waiting for connections.");
+
+  xTaskCreate(batteryUpdateTask, "BatteryUpdate", 4096, NULL, 1, NULL);
 
   // The task can now simply idle. All work is done in callbacks.
   vTaskDelete(NULL); // Or loop with a long vTaskDelay if you prefer.

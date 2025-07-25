@@ -1,14 +1,20 @@
+#include "battery/atom-base.h"
 #include "bluetooth/bluetooth.h"
 #include "keyboard/keyboard.h"
 #include "led/neopixel.h"
 #include "shared.h"
+#include "utility/Log_Class.hpp"
 
 #include <Arduino.h>
 #include <M5Unified.h>
 
 #define BUTTON_HOLD_THRESHOLD 100
 
+#define ATOM_BAT_ADC_PIN 33 // For Atom Series
+#define BAT_ADC_RESOLUTION 12
+
 NeoPixel led;
+AtomBaseBattery battery;
 
 TaskHandle_t xLedFlashTaskHandle = NULL;
 SemaphoreHandle_t xConnectionSemaphore = NULL;
@@ -54,6 +60,7 @@ void setup() {
   xTaskCreate(connectionManagerTask, "connManager", 5000, NULL, 4, NULL);
 
   led.begin();
+  battery.begin();
 
   M5.begin();
   M5.BtnA.setHoldThresh(BUTTON_HOLD_THRESHOLD);
