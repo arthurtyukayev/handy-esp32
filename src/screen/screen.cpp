@@ -1,5 +1,5 @@
 #include "screen.h"
-#include "../assets/image.cpp"
+#include "../assets/handy_bitmap.cpp"
 #include <M5Unified.h>
 
 void showBTConnectingScreen(void *) {

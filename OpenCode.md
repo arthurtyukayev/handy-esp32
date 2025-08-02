@@ -4,8 +4,6 @@
 - Build specific environment: `pio run -e m5stack-stickc-plus2` or `pio run -e m5stack-atom`
 - Upload to device: `pio run -e [env-name] -t upload`
 - Monitor serial output: `pio device monitor --port [PORT] --baud 115200` 
-- Run tests: `pio test`
-- Run single test: `pio test -f [test_file_name]`
 
 ## Code Style Guidelines
 - Use header guards with `#pragma once` in all header files
@@ -17,4 +15,3 @@
 - Use proper error handling with ESP32 log levels (CORE_DEBUG_LEVEL)
 - Follow C++ best practices: avoid global variables, use references over pointers
 - Comments should explain "why" not "what" the code does
-- For new features, create corresponding tests in the test/ directory
