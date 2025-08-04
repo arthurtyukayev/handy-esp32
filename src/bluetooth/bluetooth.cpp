@@ -124,6 +124,5 @@ void bluetoothTask(void *) {
 
   xTaskCreate(batteryUpdateTask, "BatteryUpdate", 4096, NULL, 1, NULL);
 
-  // The task can now simply idle. All work is done in callbacks.
-  vTaskDelete(NULL); // Or loop with a long vTaskDelay if you prefer.
+  vTaskDelete(NULL);
 }

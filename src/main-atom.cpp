@@ -45,7 +45,6 @@ void connectionManagerTask(void *) {
         vTaskDelay(pdMS_TO_TICKS(100));
       }
 
-      // Finally, the bluetooth was disconnected, just show a red led
       led.setRed();
     }
   }
