@@ -1,5 +1,5 @@
 #include "bluetooth.h"
-#include "../battery/atom-base.h"
+#include "../battery/battery.h"
 #include "../keyboard/keyboard.h"
 #include "BLEDevice.h"
 #include "shared.h"
@@ -16,7 +16,7 @@ BLEHIDDevice *hid = nullptr;
 BLECharacteristic *input;
 BLECharacteristic *output;
 
-extern AtomBaseBattery battery;
+extern Battery battery;
 
 const uint16_t CCCD_NOTIFICATIONS_ENABLED = 0x0001;
 

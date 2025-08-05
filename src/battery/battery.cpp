@@ -1,28 +1,28 @@
-#include "atom-base.h"
+#include "battery.h"
 #include <Arduino.h>
 #include <M5Unified.h>
 
 #define ATOM_BAT_ADC_PIN 33 // For Atom Series
 #define BAT_ADC_RESOLUTION 12
 
-void AtomBaseBattery::begin() {
+void Battery::begin() {
   pinMode(ATOM_BAT_ADC_PIN, INPUT);
   analogReadResolution(BAT_ADC_RESOLUTION);
 }
 
-uint32_t AtomBaseBattery::getAdcVoltage() {
+uint32_t Battery::getAdcVoltage() {
   uint32_t adc_vol = 0;
   adc_vol = analogReadMilliVolts(ATOM_BAT_ADC_PIN);
   return adc_vol;
 }
 
-uint32_t AtomBaseBattery::getBatteryVoltage() {
+uint32_t Battery::getBatteryVoltage() {
   uint32_t adc_vol = getAdcVoltage();
   uint32_t bat_vol = adc_vol * 2;
   return bat_vol;
 }
 
-uint8_t AtomBaseBattery::getBatteryLevel() {
+uint8_t Battery::getBatteryLevel() {
   uint32_t voltage = getBatteryVoltage();
   float voltageInVolts = voltage / 1000.0f;
 

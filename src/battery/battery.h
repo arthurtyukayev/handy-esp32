@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-class AtomBaseBattery {
+class Battery {
 public:
   void begin();
   uint32_t getAdcVoltage();
