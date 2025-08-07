@@ -8,8 +8,6 @@
 #include <M5Unified.h>
 
 #define BUTTON_HOLD_THRESHOLD 100
-#define ATOM_BAT_ADC_PIN 38 // For Stick Series
-#define BAT_ADC_RESOLUTION 12
 
 Battery battery;
 
