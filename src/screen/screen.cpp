@@ -1,5 +1,4 @@
 #include "screen.h"
-#include "../assets/handy_bitmap.cpp"
 #include <M5Unified.h>
 
 void showBTConnectingScreen(void *) {
@@ -19,20 +18,6 @@ void showBTConnectingScreen(void *) {
   const int iconHeight = 64; // Height of the bitmap array
   const int centerX = (M5.Display.width() - iconWidth * 2) / 2;
   const int iconY = 60;
-
-  // Draw the bitmap at 2x size
-  for (int y = 0; y < iconHeight; y++) {
-    for (int x = 0; x < iconWidth; x++) {
-      uint16_t color = epd_bitmap_tray_idle[y * iconWidth + x];
-      if (color != 0) { // Only draw non-black pixels
-        // Draw 2x2 block for each pixel
-        M5.Display.drawPixel(centerX + x * 2, iconY + y * 2, color);
-        M5.Display.drawPixel(centerX + x * 2 + 1, iconY + y * 2, color);
-        M5.Display.drawPixel(centerX + x * 2, iconY + y * 2 + 1, color);
-        M5.Display.drawPixel(centerX + x * 2 + 1, iconY + y * 2 + 1, color);
-      }
-    }
-  }
 
   int dotCount = 0;
   while (true) {
