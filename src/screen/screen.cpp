@@ -5,12 +5,14 @@
 
 extern Battery battery;
 
+void drawHeader(int x, int y, int textSize) {
+  M5.Display.setTextColor(WHITE);
+  M5.Display.setCursor(x, y);
+  M5.Display.setTextSize(textSize);
+  M5.Display.println(DEVICE_BLUETOOTH_NAME);
+}
+
 void drawBatteryIndicator(uint8_t batteryLevel) {
-  // Display battery text
-  M5.Display.setTextSize(1);
-  M5.Display.setCursor(4, M5.Display.height() - 20);
-  M5.Display.println("Battery");
-  
   // Draw battery level bar
   int barWidth = M5.Display.width() * batteryLevel / 100;
   int barHeight = 10;
@@ -29,19 +31,26 @@ void drawBatteryIndicator(uint8_t batteryLevel) {
   // Draw background and foreground bars
   M5.Display.fillRect(0, barY, M5.Display.width(), barHeight, DARKGREY);
   M5.Display.fillRect(0, barY, barWidth, barHeight, barColor);
+
+  // Display battery text on top of the battery bar
+  M5.Display.setTextSize(1);
+  M5.Display.setTextColor(BLACK);
+  // Center the text directly on top of the battery bar
+  int textX = 2;
+  int textY = barY + 1; // Position text on top of the battery bar with a small offset
+  M5.Display.setCursor(textX, textY);
+  M5.Display.println("Battery");
+
 }
 
 void showBTConnectingScreen(void *) {
   M5.Display.setRotation(0);
-  M5.Display.fillScreen(BLACK);
-  M5.Display.setTextColor(WHITE);
+  M5.Display.fillScreen(BLACK); M5.Display.setTextColor(WHITE);
   M5.Display.setTextSize(1);
 
   // Draw static elements once
   // Title with device name from build flags
-  M5.Display.setCursor(4, 20);
-  M5.Display.setTextSize(1);
-  M5.Display.println(DEVICE_BLUETOOTH_NAME);
+  drawHeader(2, 20, 1);
 
   // Draw bitmap icon
   const int iconWidth = 64;  // Width of the bitmap array
@@ -59,8 +68,9 @@ void showBTConnectingScreen(void *) {
     M5.Display.fillRect(30, M5.Display.height() - 60, M5.Display.width() - 30, 20, BLACK);
 
     // Connection status
+    M5.Display.setTextColor(WHITE);
     M5.Display.setTextSize(1);
-    M5.Display.setCursor(4, M5.Display.height()/2 - 10);
+    M5.Display.setCursor(2, M5.Display.height()/2 - 10);
     M5.Display.print("Connecting");
 
     // Animated dots
@@ -97,9 +107,13 @@ void showBTConnectedScreen(void *) {
      
       uint8_t batteryLevel = battery.getBatteryLevel();
       
+      // Display header
+      drawHeader(2, 10, 1);
+      
       // Display "TALKING" text
       M5.Display.setTextSize(2);
-      M5.Display.setCursor(8, M5.Display.height()/2 - 10);
+      M5.Display.setTextColor(WHITE);
+      M5.Display.setCursor(2, M5.Display.height()/2 - 10);
       M5.Display.println("TALKING");
       
       // Draw battery indicator using the shared function
@@ -122,13 +136,11 @@ void showBTConnectedScreen(void *) {
 void showBTDisconnectedScreen() {
   M5.Display.setRotation(0);
   M5.Display.fillScreen(RED);
-  M5.Display.setTextColor(WHITE);
-  M5.Display.setTextSize(2);
-
-  M5.Display.setCursor(10, 20);
-  M5.Display.println("Handy");
+  
+  drawHeader(10, 20, 2);
 
   M5.Display.setCursor(10, 50);
+  M5.Display.setTextSize(2);
   M5.Display.println("Disconnected");
 
   M5.Display.setTextSize(1);
