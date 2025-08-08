@@ -16,17 +16,33 @@ TaskHandle_t xBTConnectedScreenTaskHandle = NULL;
 SemaphoreHandle_t xConnectionSemaphore = NULL;
 
 void connectionManagerTask(void *) {
-  if (xSemaphoreTake(xConnectionSemaphore, portMAX_DELAY) == pdTRUE) {
-    if (xBTConnectingScreenTaskHandle != NULL) {
-      vTaskDelete(xBTConnectingScreenTaskHandle);
-      xBTConnectingScreenTaskHandle = NULL;
+  for (;;) {
+    if (xSemaphoreTake(xConnectionSemaphore, portMAX_DELAY) == pdTRUE) {
+      if (xBTConnectingScreenTaskHandle != NULL) {
+        vTaskDelete(xBTConnectingScreenTaskHandle);
+        xBTConnectingScreenTaskHandle = NULL;
+      }
+
+      if (xBTConnectedScreenTaskHandle == NULL) {
+        xTaskCreate(showBTConnectedScreen, "connectedScreen", 4096, NULL, 6,
+                    &xBTConnectedScreenTaskHandle);
+      }
+
+      while (isBleConnected) {
+        vTaskDelay(pdMS_TO_TICKS(100));
+      }
+
+      if (xBTConnectedScreenTaskHandle != NULL) {
+        vTaskDelete(xBTConnectedScreenTaskHandle);
+        xBTConnectedScreenTaskHandle = NULL;
+      }
+
+      if (xBTConnectingScreenTaskHandle == NULL) {
+        xTaskCreate(showBTConnectingScreen, "connectingScreen", 4096, NULL, 6,
+                    &xBTConnectingScreenTaskHandle);
+      }
     }
-
-    xTaskCreate(showBTConnectedScreen, "connectedScreen", 5000, NULL, 6,
-                &xBTConnectedScreenTaskHandle);
   }
-
-  vTaskDelete(NULL);
 }
 
 void setup() {
@@ -34,13 +50,15 @@ void setup() {
 
   xConnectionSemaphore = xSemaphoreCreateBinary();
 
-  xTaskCreate(bluetoothTask, "bluetooth", 20000, NULL, 5, NULL);
-  xTaskCreate(connectionManagerTask, "connManager", 5000, NULL, 4, NULL);
+  xTaskCreate(bluetoothTask, "bluetooth", 8192, NULL, 5, NULL);
+  xTaskCreate(connectionManagerTask, "connManager", 4096, NULL, 4, NULL);
 
   M5.begin();
   M5.BtnA.setHoldThresh(BUTTON_HOLD_THRESHOLD);
 
-  xTaskCreate(showBTConnectingScreen, "connectingScreen", 20000, NULL, 6,
+  battery.begin();
+
+  xTaskCreate(showBTConnectingScreen, "connectingScreen", 4096, NULL, 6,
               &xBTConnectingScreenTaskHandle);
 }
 

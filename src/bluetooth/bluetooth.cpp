@@ -11,7 +11,7 @@
 
 #define DEVICE_MANUFACTURER_NAME "M5Stack"
 
-bool isBleConnected = false;
+volatile bool isBleConnected = false;
 BLEHIDDevice *hid = nullptr;
 BLECharacteristic *input;
 BLECharacteristic *output;
@@ -56,7 +56,10 @@ void BleKeyboardCallbacks::onDisconnect(BLEServer *server) {
       (BLE2902 *)input->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));
   cccDesc->setNotifications(false);
 
-  M5_LOGI("Client has disconnected");
+  BLEAdvertising *advertising = server->getAdvertising();
+  advertising->start();
+
+  M5_LOGI("Client has disconnected, restarted advertising");
 }
 
 void OutputCallbacks::onWrite(BLECharacteristic *characteristic) {

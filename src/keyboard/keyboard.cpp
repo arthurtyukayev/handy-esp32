@@ -1,18 +1,16 @@
 #include "keyboard.h"
-#include "HIDKeyboardTypes.h"
 
 const InputReport NO_KEY_PRESSED = {};
 
 void sendKey() {
-  // Chnage the letter, the default is option + i / alt + i
-  const char *i = "i";
-  const uint RIGHT_ALT_KEY = 64;
-  KEYMAP map = keymap[(uint8_t)*i];
+  constexpr uint8_t HID_KEY_I = 0x0C;
+  constexpr uint8_t RIGHT_ALT_KEY = 0x40;
 
-  // Remove or change the modifier, default is RIGHT_ALT_KEY / Right option key 
-  InputReport report = {.modifiers = RIGHT_ALT_KEY,
-                        .reserved = 0,
-                        .pressedKeys = {map.usage, 0, 0, 0, 0, 0}};
+  InputReport report = {
+      .modifiers = RIGHT_ALT_KEY,
+      .reserved = 0,
+      .pressedKeys = {HID_KEY_I, 0, 0, 0, 0, 0},
+  };
 
   input->setValue((uint8_t *)&report, sizeof(report));
   input->notify();

@@ -4,7 +4,7 @@
 #include "BLEHIDDevice.h"
 #include <Arduino.h>
 
-extern bool isBleConnected;
+extern volatile bool isBleConnected;
 extern BLEHIDDevice *hid;
 extern const uint8_t REPORT_MAP[];
 

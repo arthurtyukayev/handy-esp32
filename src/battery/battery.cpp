@@ -4,7 +4,7 @@
 
 
 #ifndef BAT_ADC_PIN
-#define BAT_ADC_PIN 33 // For Atom Series
+#define BAT_ADC_PIN 33
 #endif
 #define BAT_ADC_RESOLUTION 12
 

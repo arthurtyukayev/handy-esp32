@@ -9,9 +9,6 @@
 #include <M5Unified.h>
 
 #define BUTTON_HOLD_THRESHOLD 100
-#define ATOM_BAT_ADC_PIN 33 // For Atom Series
-#define BAT_ADC_RESOLUTION 12
-
 NeoPixel led;
 Battery battery;
 

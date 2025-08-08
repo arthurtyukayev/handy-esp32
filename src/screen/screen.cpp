@@ -45,8 +45,8 @@ void showBTConnectingScreen(void *) {
 
   drawHeader(2, 20, 1);
 
-  const int iconWidth = 64;  // Width of the bitmap array
-  const int iconHeight = 64; // Height of the bitmap array
+  const int iconWidth = 64;
+  const int iconHeight = 64;
   const int centerX = (M5.Display.width() - iconWidth * 2) / 2;
   const int iconY = 60;
 
@@ -146,7 +146,7 @@ void showBTConnectedScreen(void *) {
             sumsq += (uint64_t)(v * (int64_t)v);
           }
           float rms =
-              sqrtf((float)sumsq / (float)record_length) / 32768.0f; // 0..~1
+              sqrtf((float)sumsq / (float)record_length) / 32768.0f;
 
           float peak = 0.0f;
           for (size_t i = 0; i < record_length; ++i) {
