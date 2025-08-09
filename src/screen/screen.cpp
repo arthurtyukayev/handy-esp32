@@ -42,38 +42,32 @@ void showBTConnectingScreen(void *) {
   M5.Display.fillScreen(BLACK);
   M5.Display.setTextColor(WHITE);
   M5.Display.setTextSize(1);
+  M5.Display.setBrightness(15);
 
-  drawHeader(2, 20, 1);
-
-  const int iconWidth = 64;
-  const int iconHeight = 64;
-  const int centerX = (M5.Display.width() - iconWidth * 2) / 2;
-  const int iconY = 60;
+  drawHeader(2, 8, 1);
 
   uint8_t batteryLevel = battery.getBatteryLevel();
   drawBatteryIndicator(batteryLevel);
 
-  int dotCount = 0;
+  uint32_t cycle = 0;
   while (true) {
-    M5.Display.fillRect(30, M5.Display.height() - 60, M5.Display.width() - 30,
-                        20, BLACK);
-
+    int statusY = M5.Display.height() / 2 - 10;
+    M5.Display.fillRect(0, statusY - 2, M5.Display.width(), 16, BLACK);
+    M5.Display.setCursor(2, statusY);
     M5.Display.setTextColor(WHITE);
-    M5.Display.setTextSize(1);
-    M5.Display.setCursor(2, M5.Display.height() / 2 - 10);
     M5.Display.print("Connecting");
-
-    for (int i = 0; i < (dotCount % 4); i++) {
-      M5.Display.print(".");
+    int dots = (cycle % 4);
+    for (int i = 0; i < dots; ++i) {
+      M5.Display.print('.');
     }
 
-    if (dotCount % 10 == 0) {
+    if (cycle % 15 == 0) {
       batteryLevel = battery.getBatteryLevel();
       drawBatteryIndicator(batteryLevel);
     }
 
-    dotCount++;
-    vTaskDelay(pdMS_TO_TICKS(500));
+    cycle++;
+    vTaskDelay(pdMS_TO_TICKS(2000));
   }
 }
 
@@ -105,7 +99,7 @@ void showBTConnectedScreen(void *) {
 
     if (M5.BtnA.isPressed() && !screenActive) {
       M5.Display.wakeup();
-      M5.Display.setBrightness(100);
+      M5.Display.setBrightness(15);
       M5.Display.setRotation(0);
       M5.Display.fillScreen(BLACK);
 
@@ -145,8 +139,7 @@ void showBTConnectedScreen(void *) {
             int32_t v = samples[i];
             sumsq += (uint64_t)(v * (int64_t)v);
           }
-          float rms =
-              sqrtf((float)sumsq / (float)record_length) / 32768.0f;
+          float rms = sqrtf((float)sumsq / (float)record_length) / 32768.0f;
 
           float peak = 0.0f;
           for (size_t i = 0; i < record_length; ++i) {
@@ -167,7 +160,7 @@ void showBTConnectedScreen(void *) {
           if (barH > meterHeight)
             barH = meterHeight;
 
-          uint16_t color = DARKGREY;
+          uint16_t color = LIGHTGREY;
 
           if (barH > prevBarH) {
             int dh = barH - prevBarH;
