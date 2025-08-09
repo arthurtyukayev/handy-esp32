@@ -57,7 +57,13 @@ void setup() {
   led.begin();
   battery.begin();
 
-  M5.begin();
+  auto cfg = M5.config();
+  cfg.output_power = false;
+  cfg.internal_mic = false;
+  cfg.internal_spk = false;
+  cfg.internal_imu = false;
+  cfg.led_brightness = 0;
+  M5.begin(cfg);
   M5.BtnA.setHoldThresh(BUTTON_HOLD_THRESHOLD);
 
   xTaskCreate(flashPixel, "ledflash", 5000, NULL, 6, &xLedFlashTaskHandle);

@@ -14,4 +14,4 @@
 - Declare task handles and semaphores as external in shared header files
 - Use proper error handling with ESP32 log levels (CORE_DEBUG_LEVEL)
 - Follow C++ best practices: avoid global variables, use references over pointers
-- Comments should explain "why" not "what" the code does
+- Avoid using comments, instead use meaningful names and self-documenting code

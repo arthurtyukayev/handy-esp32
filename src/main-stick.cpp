@@ -53,7 +53,12 @@ void setup() {
   xTaskCreate(bluetoothTask, "bluetooth", 8192, NULL, 5, NULL);
   xTaskCreate(connectionManagerTask, "connManager", 4096, NULL, 4, NULL);
 
-  M5.begin();
+  auto cfg = M5.config();
+  cfg.output_power = false;
+  cfg.internal_spk = false;
+  cfg.internal_imu = false;
+  cfg.led_brightness = 0;
+  M5.begin(cfg);
   M5.BtnA.setHoldThresh(BUTTON_HOLD_THRESHOLD);
 
   battery.begin();
