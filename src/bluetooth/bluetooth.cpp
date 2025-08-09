@@ -121,6 +121,12 @@ void bluetoothTask(void *) {
   advertising->setAppearance(HID_KEYBOARD);
   advertising->addServiceUUID(hid->hidService()->getUUID());
   advertising->addServiceUUID(hid->deviceInfo()->getUUID());
+
+  BLEDevice::setPower(ESP_PWR_LVL_N9, ESP_BLE_PWR_TYPE_ADV);
+  BLEDevice::setPower(ESP_PWR_LVL_N9, ESP_BLE_PWR_TYPE_DEFAULT);
+  advertising->setMinInterval(512);
+  advertising->setMaxInterval(1024);
+
   advertising->start();
 
   M5_LOGI("Bluetooth task started. Waiting for connections.");
