@@ -48,6 +48,7 @@ void connectionManagerTask(void *) {
 
 void setup() {
   Serial.begin(115200);
+  setCpuFrequencyMhz(80);
 
   xConnectionSemaphore = xSemaphoreCreateBinary();
 
